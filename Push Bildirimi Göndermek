@@ -1,0 +1,49 @@
+npm install web-push
+
+// server.js
+const webPush = require('web-push');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+// VAPID Anahtarlarýnýzý buraya girin
+const publicVapidKey = '<YOUR_PUBLIC_VAPID_KEY>';
+const privateVapidKey = '<YOUR_PRIVATE_VAPID_KEY>';
+
+// VAPID Anahtarlarýný ayarlýyoruz
+webPush.setVapidDetails(
+  'mailto:example@yourdomain.org', // Kendi e-posta adresinizi yazýn
+  publicVapidKey,
+  privateVapidKey
+);
+
+// Middleware: JSON verisini iþleme
+app.use(bodyParser.json());
+
+// Kullanýcýlara bildirim göndermek için endpoint
+app.post('/send-notification', (req, res) => {
+  const subscription = req.body.subscription;
+  
+  const payload = JSON.stringify({
+    title: 'Yeni Bildirim!',
+    body: 'Bu bir test bildirimi.',
+    icon: 'icons/notification-icon.png'
+  });
+
+  // Push bildirim gönderme
+  webPush.sendNotification(subscription, payload)
+    .then(response => {
+      res.status(200).json({ success: true });
+    })
+    .catch(err => {
+      res.status(500).json({ error: err });
+    });
+});
+
+// Sunucu baþlatma
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+

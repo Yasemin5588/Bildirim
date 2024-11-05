@@ -1,0 +1,22 @@
+// service-worker.js
+self.addEventListener('push', function(event) {
+  const options = {
+    body: event.data ? event.data.text() : 'Yeni bir bildirim!',
+    icon: 'icons/notification-icon.png',
+    badge: 'icons/notification-badge.png'
+  };
+
+  // Bildirimi göster
+  event.waitUntil(
+    self.registration.showNotification('Yeni Bildirim!', options)
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  
+  // Bildirime týklanýnca sayfa açýlabilir
+  event.waitUntil(
+    clients.openWindow('https://www.example.com')
+  );
+});
